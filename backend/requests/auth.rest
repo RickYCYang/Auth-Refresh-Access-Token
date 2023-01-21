@@ -1,0 +1,23 @@
+### Register a new user
+POST http://localhost:3500/register
+Content-Type: application/json
+
+{
+  "user": "rick",
+  "pwd": "secret"
+}
+
+### Login
+POST http://localhost:3500/auth
+Content-Type: application/json
+
+{
+  "user": "rick",
+  "pwd": "secret"
+}
+
+### Logout
+GET http://localhost:3500/logout
+
+### Exchange refresh token and access token
+GET http://localhost:3500/refresh
