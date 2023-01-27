@@ -1,0 +1,57 @@
+@startuml
+
+Actor User
+Boundary PrivatePage
+Entity useAxios
+Entity useAuth
+Entity useRefreshToken
+Control SecuredAPI
+Entity JWTMiddleware
+Control RefreshTokenController
+Database Database
+
+User -> PrivatePage
+PrivatePage -> useAxios
+useAxios -> useAuth: get access token
+useAxios <-- useAuth: access token
+opt access token && axios.header[Authorization] is null
+  useAxios -> useAxios: request interceptor: \nset Authorization header
+end
+useAxios -> SecuredAPI: send request
+SecuredAPI -> JWTMiddleware: verify Authorization header
+
+alt token is invalid
+  useAxios <-- JWTMiddleware: return 403
+  useAxios -> useAxios: response interceptor catch 403
+  useAxios -> useRefreshToken: refresh()
+  useRefreshToken -> RefreshTokenController: send refresh request with httpOnly cookie
+  RefreshTokenController -> Database: find user by refresh token
+  RefreshTokenController <-- Database: user's info
+  alt user found and token is verified
+    RefreshTokenController -> RefreshTokenController: sign a new refresh token and access token
+    RefreshTokenController -> Database: replace old refresh token by new one
+    useRefreshToken <-- RefreshTokenController: return use's info with new refresh token and access token
+    useRefreshToken -> useAuth: set new access token and user's info
+    useAxios <-- useRefreshToken: new access token
+    useAxios -> SecuredAPI: send original request with new access token
+    useAxios <-- SecuredAPI: data
+    PrivatePage <-- useAxios
+    User <-- PrivatePage
+  else
+    useRefreshToken <-- RefreshTokenController: return 403
+    useAxios <-- useRefreshToken
+    PrivatePage <-- useAxios
+    User <-- PrivatePage: error message
+
+  end
+else 
+  JWTMiddleware -> SecuredAPI
+  useAxios <-- SecuredAPI: return data
+  PrivatePage <-- useAxios
+  User <-- PrivatePage
+end
+
+
+
+
+@endyml

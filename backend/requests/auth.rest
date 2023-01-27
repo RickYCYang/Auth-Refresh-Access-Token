@@ -3,7 +3,7 @@ POST http://localhost:3500/register
 Content-Type: application/json
 
 {
-  "user": "rick",
+  "user": "aris",
   "pwd": "secret"
 }
 
@@ -12,7 +12,7 @@ POST http://localhost:3500/auth
 Content-Type: application/json
 
 {
-  "user": "rick",
+  "user": "aris", 
   "pwd": "secret"
 }
 
