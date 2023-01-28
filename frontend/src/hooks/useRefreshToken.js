@@ -1,4 +1,4 @@
-import axios from '../api/axios';
+import axios from 'axios';
 import useAuth from './useAuth';
 
 const useRefreshToken = () => {
@@ -6,6 +6,7 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     const response = await axios.get('/refresh', {
+      baseURL: process.env.REACT_APP_BACKEND_URL,
       withCredentials: true,
     });
     setAuth((prev) => {
